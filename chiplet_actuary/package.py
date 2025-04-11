@@ -175,7 +175,7 @@ class Advanced(Package):
 
     def NRE(self):
         return self.interposer_area() * self.NRE_cost_factor + self.NRE_cost_fixed + self.area(
-        ) * spec.cost_factor_os
+        ) * spec.os_NRE_cost_factor + spec.os_NRE_cost_fixed
 
     def package_yield(self):
         return (1 + self.defect_density / 100 * self.interposer_area() / self.critical_level)**(
