@@ -150,10 +150,14 @@ def single_system_RE_cost(num_chip: int, node: str) -> pd.DataFrame:
 
     RE_sheet = pd.DataFrame()
     for i in range(len(Areas)):
+        # 创建多级索引的元组列表
+        index_tuples = [(Areas[i], 'SoC OS'), (Areas[i], '2.5D OS'), 
+                       (Areas[i], '2.5D FO'), (Areas[i], '2.5D SI'), 
+                       (Areas[i], '')]
+        
         RE_sheet = RE_sheet._append(
             pd.DataFrame.from_records([src[i], irc[i][0:5], irc[i][5:10], irc[i][10:15], ()],
-                                      index=[[Areas[i]] * 5,
-                                             ['SoC OS', '2.5D OS', '2.5D FO', '2.5D SI', '']],
+                                      index=index_tuples,
                                       columns=[
                                           'raw chips', 'defect chips', 'raw package',
                                           'defect pacakge', 'wasted chips'

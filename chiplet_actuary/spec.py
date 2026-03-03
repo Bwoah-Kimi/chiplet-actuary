@@ -1,6 +1,9 @@
 from configparser import ConfigParser
+import os
 
-parameter_path = "parameter.ini"
+# Build the absolute path to parameter.ini relative to this file's location
+dir_path = os.path.dirname(os.path.realpath(__file__))
+parameter_path = os.path.join(dir_path, "..", "parameter.ini")
 
 param = ConfigParser()
 param.read(parameter_path)

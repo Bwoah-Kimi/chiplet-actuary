@@ -2,6 +2,7 @@ from chiplet_actuary.chip import Chip
 from chiplet_actuary.module import Module
 import chiplet_actuary.spec as spec
 import math
+from typing import Tuple, Dict
 
 
 class Package():
@@ -77,7 +78,7 @@ class Package():
     def cost_package(self):
         pass
 
-    def cost_RE(self) -> tuple[float, float, float, float, float]:
+    def cost_RE(self) -> Tuple[float, float, float, float, float]:
         '''
         (RE_raw_chips, RE_defect_chips, RE_raw_package, RE_defect_pacakge, RE_wasted_KGD)
         '''
@@ -141,14 +142,11 @@ class OS(Package):
     def cost_package(self):
         return sum(self.cost_RE()[2:5])
 
-    def cost_total_system(self):
-        return sum(self.cost_RE())
-
 
 class Advanced(Package):
     def __init__(self,
                  name: str,
-                 chips: dict[Chip, int],
+                 chips: Dict[Chip, int],
                  NRE_cost_factor: float,
                  NRE_cost_fixed: float,
                  wafer_cost: float,
@@ -178,15 +176,16 @@ class Advanced(Package):
         ) * spec.os_NRE_cost_factor + spec.os_NRE_cost_fixed
 
     def package_yield(self):
-        return (1 + self.defect_density / 100 * self.interposer_area() / self.critical_level)**(
+        return (1 + self.defect_density / 1000 * self.interposer_area() / self.critical_level)**(
             -self.critical_level)
 
     def N_package_total(self):
         area = self.interposer_area() + 2 * spec.scribe_lane * math.sqrt(
             self.interposer_area()) + spec.scribe_lane**2
-        N_total_package = math.pi * (
-            spec.wafer_diameter / 2 - spec.edge_loss)**2 / area - math.pi * (
-                spec.wafer_diameter - 2 * spec.edge_loss) / math.sqrt(2 * area)
+        # N_total_package = math.pi * (
+        #     spec.wafer_diameter / 2 - spec.edge_loss)**2 / area - math.pi * (
+        #         spec.wafer_diameter - 2 * spec.edge_loss) / math.sqrt(2 * area)
+        N_total_package = math.pi * (spec.wafer_diameter / 2 - spec.edge_loss)**2 / area
         return N_total_package
 
     def cost_interposer(self):
@@ -212,7 +211,7 @@ class Advanced(Package):
             cost_defect_package = self.cost_interposer() * (1 / (y1 * y2 * y3) - 1) \
                 + self.cost_substrate() * (1 / y3 - 1)
             cost_wasted_chips = (cost_raw_chips + cost_defect_chips) * (1 / (y2 * y3) - 1)
-
+            
         elif self.chip_last == 0:
             cost_defect_package = self.cost_interposer() * (1 / (y1 * y3) - 1) \
                 + self.cost_substrate() * (1 / y3 - 1)
